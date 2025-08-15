@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Serena cache
+.serena/cache/
+.serena/memories/
+.serena/logs/
+
+# 計画ディレクトリ
+計画/*
