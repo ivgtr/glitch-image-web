@@ -12,6 +12,7 @@ export interface UseGlitchEffectReturn {
   startDragGlitch: (clickY: number, splitHeight: number) => void;
   glitchImage: (distanceX: number, baseY: number, mode: GlitchMode, splitHeight: number) => void;
   applyRandomGlitch: () => void;
+  applyRandomGlitchWithIntensity: (intensity: number, count: number) => void;
   applyDragGlitch: (distanceX: number, mode: GlitchMode, splitHeight: number, clickY: number) => void;
   finalizeDragGlitch: () => void;
   resetCanvas: () => void;
@@ -223,6 +224,117 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
     prevImageDataRef.current = currentImageData;
   }, [getCanvas]);
 
+  const applyRandomGlitchWithIntensity = useCallback((intensity: number, count: number) => {
+    if (!originImageDataRef.current) return;
+
+    const { canvas, ctx } = getCanvas();
+
+    // 強度に応じた基本設定
+    const clampedIntensity = Math.max(0, Math.min(1, intensity));
+    
+    // 重ね掛け回数をさらに制限（最大2回まで）
+    const limitedCount = Math.min(count, 2);
+    
+    // フラッシュパターン：20%の確率で元画像に急に戻す
+    if (Math.random() < 0.2) {
+      ctx.putImageData(originImageDataRef.current, 0, 0);
+      prevImageDataRef.current = new ImageData(
+        new Uint8ClampedArray(originImageDataRef.current.data),
+        originImageDataRef.current.width,
+        originImageDataRef.current.height
+      );
+      return;
+    }
+    
+    // 複数回適用で重ね掛け効果
+    for (let application = 0; application < limitedCount; application++) {
+      const currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const width = canvas.width;
+      const height = canvas.height;
+      
+      // 強度に基づいてグリッチポイント数を調整（1-3箇所にさらに減少）
+      const baseGlitches = Math.floor(clampedIntensity * 2) + 1; // 1-3
+      const numGlitches = baseGlitches + (Math.random() < 0.3 ? 0 : 1); // 0-1のランダム性（確率を下げる）
+      
+      const cloneImageData = ctx.createImageData(currentImageData);
+      cloneImageData.data.set(currentImageData.data);
+      
+      for (let g = 0; g < numGlitches; g++) {
+        // 強度に基づいてグリッチエリアの高さを調整（さらに控えめに）
+        const minHeight = Math.floor(clampedIntensity * 10) + 2; // 2-12px
+        const maxHeight = Math.floor(clampedIntensity * 25) + 5; // 5-30px
+        const glitchHeight = Math.floor(Math.random() * (maxHeight - minHeight)) + minHeight;
+        
+        const y = Math.floor(Math.random() * (height - glitchHeight));
+        
+        // 強度に基づいてずらし量を調整（画像幅の0-20%にさらに減少）
+        const maxShift = clampedIntensity * width * 0.2;
+        const shiftR = Math.floor((Math.random() - 0.5) * maxShift);
+        const shiftG = Math.floor((Math.random() - 0.5) * maxShift);
+        const shiftB = Math.floor((Math.random() - 0.5) * maxShift);
+        
+        const originalData = new Uint8ClampedArray(cloneImageData.data);
+        
+        for (let row = y; row < Math.min(y + glitchHeight, height); row++) {
+          for (let x = 0; x < width; x++) {
+            const i = (row * width + x) * 4;
+            
+            // Rチャンネルをずらし
+            const dstXR = x + shiftR;
+            if (dstXR >= 0 && dstXR < width) {
+              const dstIR = (row * width + dstXR) * 4;
+              cloneImageData.data[dstIR + 0] = originalData[i + 0];
+            }
+            
+            // Gチャンネルをずらし
+            const dstXG = x + shiftG;
+            if (dstXG >= 0 && dstXG < width) {
+              const dstIG = (row * width + dstXG) * 4;
+              cloneImageData.data[dstIG + 1] = originalData[i + 1];
+            }
+            
+            // Bチャンネルをずらし
+            const dstXB = x + shiftB;
+            if (dstXB >= 0 && dstXB < width) {
+              const dstIB = (row * width + dstXB) * 4;
+              cloneImageData.data[dstIB + 2] = originalData[i + 2];
+            }
+          }
+        }
+      }
+      
+      // アルファチャンネルをRGBの内容に基づいて再計算
+      for (let i = 0; i < cloneImageData.data.length; i += 4) {
+        if (
+          cloneImageData.data[i + 0] ||
+          cloneImageData.data[i + 1] ||
+          cloneImageData.data[i + 2]
+        ) {
+          cloneImageData.data[i + 3] = 255;
+        } else {
+          cloneImageData.data[i + 3] = 0;
+        }
+      }
+      
+      ctx.putImageData(cloneImageData, 0, 0);
+      
+      // 各回の適用後に10%の確率で早期に元画像フラッシュ
+      if (Math.random() < 0.1) {
+        ctx.putImageData(originImageDataRef.current, 0, 0);
+        prevImageDataRef.current = new ImageData(
+          new Uint8ClampedArray(originImageDataRef.current.data),
+          originImageDataRef.current.width,
+          originImageDataRef.current.height
+        );
+        return;
+      }
+    }
+    
+    // 現在の状態を保存
+    const finalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    prevImageDataRef.current = finalImageData;
+  }, [getCanvas]);
+
   const applyDragGlitch = useCallback((
     distanceX: number,
     mode: GlitchMode,
@@ -284,6 +396,7 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
     startDragGlitch,
     glitchImage,
     applyRandomGlitch,
+    applyRandomGlitchWithIntensity,
     applyDragGlitch,
     finalizeDragGlitch,
     resetCanvas,

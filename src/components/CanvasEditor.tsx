@@ -8,6 +8,9 @@ interface CanvasEditorProps {
   onReset: () => void;
   onRandomGlitch: () => void;
   onDownload: () => void;
+  onGenerateGif: () => void;
+  isGeneratingGif: boolean;
+  gifProgress: number;
   splitHeight: number;
   mode: GlitchMode;
 }
@@ -19,6 +22,9 @@ export const CanvasEditor = ({
   onReset,
   onRandomGlitch,
   onDownload,
+  onGenerateGif,
+  isGeneratingGif,
+  gifProgress,
   splitHeight,
   mode
 }: CanvasEditorProps) => {
@@ -190,6 +196,27 @@ export const CanvasEditor = ({
           className="px-4 py-2 bg-green-50 hover:bg-green-100 border border-green-300 text-green-700 rounded-lg transition-colors duration-200 font-medium"
         >
           画像をダウンロード
+        </button>
+        <button 
+          onClick={onGenerateGif}
+          disabled={isGeneratingGif}
+          className={`px-4 py-2 rounded-lg transition-colors duration-200 font-medium relative ${
+            isGeneratingGif 
+              ? 'bg-purple-100 border border-purple-200 text-purple-500 cursor-not-allowed'
+              : 'bg-purple-50 hover:bg-purple-100 border border-purple-300 text-purple-700'
+          }`}
+        >
+          {isGeneratingGif ? (
+            <span className="flex items-center">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              GIF生成中... {gifProgress}%
+            </span>
+          ) : (
+            'GIFアニメーション生成'
+          )}
         </button>
       </div>
       

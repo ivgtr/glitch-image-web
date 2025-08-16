@@ -2,13 +2,15 @@ import { useEffect } from "react";
 import { useImageUpload } from "../hooks/useImageUpload";
 import { useGlitchEffect } from "../hooks/useGlitchEffect";
 import { useSimpleGlitch } from "../hooks/useSimpleGlitch";
+import { useGifAnimation } from "../hooks/useGifAnimation";
 import { StageProps } from "../types";
 import { ImageDropZone } from "./ImageDropZone";
 import { CanvasEditor } from "./CanvasEditor";
 
 export const Stage = ({ mode, splitHeight }: StageProps) => {
   const { image, isDragging, handleImageSelect, handleDragEnter, handleDragLeave, handleDragOver, handleDrop } = useImageUpload();
-  const { canvasRef, initializeCanvas, startDragGlitch, glitchImage, finalizeDragGlitch, resetCanvas, applyRandomGlitch, downloadImage } = useGlitchEffect();
+  const { canvasRef, initializeCanvas, startDragGlitch, glitchImage, finalizeDragGlitch, resetCanvas, applyRandomGlitch, applyRandomGlitchWithIntensity, downloadImage } = useGlitchEffect();
+  const { isGenerating, progress, generateRandomGlitchGif } = useGifAnimation();
 
   useEffect(() => {
     if (image) {
@@ -47,6 +49,10 @@ export const Stage = ({ mode, splitHeight }: StageProps) => {
     applyRandomGlitch();
   };
 
+  const handleGenerateGif = () => {
+    generateRandomGlitchGif(canvasRef, applyRandomGlitch, applyRandomGlitchWithIntensity, resetCanvas);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       {!image ? (
@@ -66,6 +72,9 @@ export const Stage = ({ mode, splitHeight }: StageProps) => {
           onReset={resetCanvas}
           onRandomGlitch={handleRandomGlitch}
           onDownload={downloadImage}
+          onGenerateGif={handleGenerateGif}
+          isGeneratingGif={isGenerating}
+          gifProgress={progress}
           splitHeight={splitHeight}
           mode={mode}
         />
