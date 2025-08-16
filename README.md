@@ -1,4 +1,5 @@
-![Image](https://github.com/user-attachments/assets/1a8ae577-fc9c-4303-abfe-c9df5b8d79b8)
+![Image](https://github.com/user-attachments/assets/1a8ae577-fc9c-4303-abfe-c9df5b8d79b8#gh-light-mode-only)
+![Image](https://github.com/user-attachments/assets/25c3d8d5-0ded-4a23-b29f-a18642e98c37#gh-dark-mode-only)
 
  _🖱️ マウス操作で画像にグリッチエフェクトを適用できるWebサイト_
 
