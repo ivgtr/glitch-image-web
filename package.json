@@ -1,7 +1,7 @@
 {
   "name": "glitch-image-web",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "リアルタイムで画像にグリッチエフェクトを適用できるWebツール",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,26 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivgtr/glitch-image-web.git"
+  },
+  "homepage": "https://ivgtr.github.io/glitch-image-web/",
+  "bugs": {
+    "url": "https://github.com/ivgtr/glitch-image-web/issues"
+  },
+  "keywords": [
+    "glitch",
+    "image-processing",
+    "canvas",
+    "react",
+    "typescript",
+    "art",
+    "creative",
+    "web-app"
+  ],
+  "author": "ivgtr",
+  "license": "MIT",
   "dependencies": {
     "gif.js": "^0.2.0",
     "react": "^19.0.0",
