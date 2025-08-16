@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { GlitchMode } from '../types';
 
 interface CanvasEditorProps {
@@ -13,6 +13,7 @@ interface CanvasEditorProps {
   gifProgress: number;
   splitHeight: number;
   mode: GlitchMode;
+  onSplitHeightChange?: (value: number) => void; // 範囲指定用
 }
 
 export const CanvasEditor = ({
@@ -26,10 +27,14 @@ export const CanvasEditor = ({
   isGeneratingGif,
   gifProgress,
   splitHeight,
-  mode
+  mode,
+  onSplitHeightChange
 }: CanvasEditorProps) => {
   const [isHovering, setIsHovering] = useState(false);
   const [mouseY, setMouseY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [dragEnd, setDragEnd] = useState(0);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
@@ -38,10 +43,63 @@ export const CanvasEditor = ({
     const rect = canvas.getBoundingClientRect();
     const y = e.clientY - rect.top;
     setMouseY(y);
-  }, []);
+    
+    if (isDragging) {
+      setDragEnd(y);
+    }
+  }, [isDragging]);
 
   const handleMouseEnter = useCallback(() => setIsHovering(true), []);
-  const handleMouseLeave = useCallback(() => setIsHovering(false), []);
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    setIsDragging(false);
+  }, []);
+
+  // 範囲指定のためのドラッグ操作（Shiftキー + ドラッグ）
+  const handleRangeMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.shiftKey && onSplitHeightChange) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      
+      setIsDragging(true);
+      setDragStart(y);
+      setDragEnd(y);
+    } else {
+      // 通常のグリッチ操作
+      onMouseDown(e);
+    }
+  }, [onMouseDown, onSplitHeightChange, canvasRef]);
+
+  const handleRangeMouseUp = useCallback(() => {
+    if (isDragging && onSplitHeightChange) {
+      const height = Math.abs(dragEnd - dragStart);
+      if (height > 5) { // 最小5pxの範囲が必要
+        onSplitHeightChange(Math.round(height));
+      }
+      setIsDragging(false);
+    }
+  }, [isDragging, dragStart, dragEnd, onSplitHeightChange]);
+
+  // グローバルマウスアップイベント
+  const handleGlobalMouseUp = useCallback(() => {
+    if (isDragging) {
+      handleRangeMouseUp();
+    }
+  }, [isDragging, handleRangeMouseUp]);
+
+  // グローバルイベントリスナーの設定
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+      return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+    }
+  }, [isDragging, handleGlobalMouseUp]);
 
   // グリッチモードに応じた色設定
   const modeColors = useMemo(() => {
@@ -90,32 +148,57 @@ export const CanvasEditor = ({
   }, [mode]);
 
   const overlayStyle = useMemo(() => {
-    if (!isHovering || !canvasRef.current) return null;
+    if (!canvasRef.current) return null;
     
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     
-    // 分割高さ範囲の計算
-    const startY = Math.max(0, mouseY - splitHeight / 2);
-    const endY = Math.min(rect.height, mouseY + splitHeight / 2);
-    const height = endY - startY;
+    if (isDragging) {
+      // ドラッグ中は選択範囲を表示
+      const startY = Math.min(dragStart, dragEnd);
+      const endY = Math.max(dragStart, dragEnd);
+      const height = endY - startY;
+      
+      return {
+        startY,
+        height: Math.max(height, 2),
+        width: rect.width,
+        mouseY: dragEnd,
+        isDragging: true
+      };
+    } else if (isHovering) {
+      // ホバー中は現在の設定範囲を表示
+      const startY = Math.max(0, mouseY - splitHeight / 2);
+      const endY = Math.min(rect.height, mouseY + splitHeight / 2);
+      const height = endY - startY;
+      
+      return {
+        startY,
+        height,
+        width: rect.width,
+        mouseY,
+        isDragging: false
+      };
+    }
     
-    return {
-      startY,
-      height,
-      width: rect.width,
-      mouseY
-    };
-  }, [isHovering, mouseY, splitHeight, canvasRef]);
+    return null;
+  }, [isHovering, mouseY, splitHeight, canvasRef, isDragging, dragStart, dragEnd]);
 
   const renderHoverOverlay = () => {
     if (!overlayStyle) return null;
     
+    const isDragMode = overlayStyle.isDragging;
+    const currentHeight = isDragMode ? Math.abs(dragEnd - dragStart) : splitHeight;
+    
     return (
       <>
-        {/* グリッチモード対応のホバー範囲表示 */}
+        {/* 範囲表示 */}
         <div
-          className={`absolute pointer-events-none border ${modeColors.border} ${modeColors.background}`}
+          className={`absolute pointer-events-none border-2 ${
+            isDragMode 
+              ? 'border-yellow-400 bg-yellow-400/30' 
+              : `${modeColors.border} ${modeColors.background}`
+          }`}
           style={{
             left: '50%',
             transform: 'translateX(-50%)',
@@ -126,9 +209,11 @@ export const CanvasEditor = ({
           }}
         />
         
-        {/* 中央線（マウス位置） */}
+        {/* 中央線またはドラッグ線 */}
         <div
-          className={`absolute pointer-events-none ${modeColors.line}`}
+          className={`absolute pointer-events-none ${
+            isDragMode ? 'bg-yellow-500' : modeColors.line
+          }`}
           style={{
             left: '50%',
             transform: 'translateX(-50%)',
@@ -139,9 +224,13 @@ export const CanvasEditor = ({
           }}
         />
         
-        {/* モード対応の情報ラベル */}
+        {/* 情報ラベル */}
         <div
-          className={`absolute pointer-events-none ${modeColors.label} text-white text-xs px-2 py-1 rounded font-medium`}
+          className={`absolute pointer-events-none text-white text-xs px-2 py-1 rounded font-medium ${
+            isDragMode 
+              ? 'bg-yellow-600' 
+              : modeColors.label
+          }`}
           style={{
             left: overlayStyle.width + 8,
             top: overlayStyle.mouseY - 10,
@@ -149,7 +238,11 @@ export const CanvasEditor = ({
             fontSize: '11px'
           }}
         >
-          <span className="font-bold">{modeColors.name}</span> {splitHeight}px
+          {isDragMode ? (
+            <>範囲選択: {Math.round(currentHeight)}px</>
+          ) : (
+            <><span className="font-bold">{modeColors.name}</span> {splitHeight}px</>
+          )}
         </div>
       </>
     );
@@ -160,11 +253,13 @@ export const CanvasEditor = ({
       <div className="relative w-full h-[300px] bg-slate-200 dark:bg-slate-800">
         <div className="flex items-center justify-center w-full h-full">
           <div 
-            onMouseDown={onMouseDown}
+            onMouseDown={handleRangeMouseDown}
             onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="relative"
+            onMouseUp={handleRangeMouseUp}
+            className="relative cursor-crosshair"
+            title="左クリック: グリッチ効果 | Shift + ドラッグ: 範囲指定"
           >
             <canvas ref={canvasRef} />
             {renderHoverOverlay()}
@@ -220,6 +315,14 @@ export const CanvasEditor = ({
         </button>
       </div>
       
+      {/* 操作説明 */}
+      <div className="text-center text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+        <p className="font-medium mb-1">操作方法</p>
+        <div className="flex flex-wrap justify-center gap-4 text-xs">
+          <span>• <strong>左クリック</strong>: グリッチエフェクト</span>
+          <span>• <strong>Shift + ドラッグ</strong>: 範囲指定（分割高さ設定）</span>
+        </div>
+      </div>
     </div>
   );
 };

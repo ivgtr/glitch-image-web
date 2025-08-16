@@ -7,7 +7,7 @@ import { StageProps } from "../types";
 import { ImageDropZone } from "./ImageDropZone";
 import { CanvasEditor } from "./CanvasEditor";
 
-export const Stage = ({ mode, splitHeight, onImageSizeChange }: StageProps) => {
+export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChange }: StageProps) => {
   const { image, isDragging, handleImageSelect, handleDragEnter, handleDragLeave, handleDragOver, handleDrop } = useImageUpload();
   const { canvasRef, imageSize, initializeCanvas, startDragGlitch, glitchImage, finalizeDragGlitch, resetCanvas, applyRandomGlitch, applyRandomGlitchWithIntensity, downloadImage } = useGlitchEffect();
   const { isGenerating, progress, generateRandomGlitchGif } = useGifAnimation();
@@ -83,6 +83,7 @@ export const Stage = ({ mode, splitHeight, onImageSizeChange }: StageProps) => {
           gifProgress={progress}
           splitHeight={splitHeight}
           mode={mode}
+          onSplitHeightChange={onSplitHeightChange}
         />
       )}
     </div>

@@ -15,6 +15,10 @@ function GlitchImage() {
   );
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
+  const handleSplitHeightChange = (value: number) => {
+    updateSettings(mode, value);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       {/* Header */}
@@ -35,6 +39,7 @@ function GlitchImage() {
             mode={mode} 
             splitHeight={splitHeight} 
             onImageSizeChange={setImageSize}
+            onSplitHeightChange={handleSplitHeightChange}
           />
         </section>
         

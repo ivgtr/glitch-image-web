@@ -64,6 +64,7 @@ export interface StageProps {
   mode: GlitchMode;
   splitHeight: SplitHeight;
   onImageSizeChange?: (imageSize: { width: number; height: number }) => void;
+  onSplitHeightChange?: (value: number) => void;
 }
 
 export interface FormProps {
