@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { GlitchMode } from '../types';
+import { CANVAS_COMPUTED_CONFIG } from '../config/canvasConfig';
 
 interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -47,7 +48,7 @@ export const CanvasEditor = ({
     if (isDragging) {
       setDragEnd(y);
     }
-  }, [isDragging]);
+  }, [isDragging, canvasRef]);
 
   const handleMouseEnter = useCallback(() => setIsHovering(true), []);
   const handleMouseLeave = useCallback(() => {
@@ -251,7 +252,8 @@ export const CanvasEditor = ({
   return (
     <div className="space-y-6">
       <div 
-        className="relative w-full h-[300px]"
+        className="relative w-full flex justify-center items-center py-4"
+        style={{ maxWidth: `${CANVAS_COMPUTED_CONFIG.CONTAINER_MAX_WIDTH}px`, margin: '0 auto' }}
       >
         <div className="flex items-center justify-center w-full h-full">
           <div 
@@ -263,7 +265,10 @@ export const CanvasEditor = ({
             className="relative cursor-crosshair transparency-checkerboard"
             title="左クリック: グリッチ効果 | Shift + ドラッグ: 範囲指定"
           >
-            <canvas ref={canvasRef} />
+            <canvas 
+              ref={canvasRef} 
+              className="block"
+            />
             {renderHoverOverlay()}
           </div>
         </div>

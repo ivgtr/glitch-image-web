@@ -1,4 +1,5 @@
 import { GlitchMode } from '../types';
+import { calculateCanvasSize } from '../config/canvasConfig';
 
 /**
  * ファイルをBase64形式に変換
@@ -19,7 +20,7 @@ export const fileToBase64 = (file: File): Promise<string | null> => {
 };
 
 /**
- * 画像をCanvas上にロード（元実装仕様：グリッチ用2倍幅）
+ * 画像をCanvas上にロード（レスポンシブサイズ対応版）
  */
 export const loadImageToCanvas = (
   canvas: HTMLCanvasElement, 
@@ -34,14 +35,15 @@ export const loadImageToCanvas = (
 
     const img = new Image();
     img.onload = () => {
-      // 元実装と完全に同じ変数名と計算
-      const aspectRatio = img.width / img.height;
-      const iw = 300 * aspectRatio;
-      canvas.width = iw * 2;
-      canvas.height = 300;
-      const x = (canvas.width - iw) / 2;
-      const y = (canvas.height - 300) / 2;
-      ctx.drawImage(img, x, y, iw, 300);
+      // 設定ファイルから論理的に計算されたサイズを取得
+      const sizes = calculateCanvasSize(img.width, img.height);
+      
+      // Canvas内部解像度を設定
+      canvas.width = sizes.canvasWidth;
+      canvas.height = sizes.canvasHeight;
+      
+      // 画像をCanvas中央に配置
+      ctx.drawImage(img, sizes.imageOffsetX, 0, sizes.displayWidth, sizes.displayHeight);
       
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
@@ -61,6 +63,7 @@ export const loadImageToCanvas = (
       // 修正したimageDataをCanvasに再描画
       ctx.putImageData(imageData, 0, 0);
       
+      // Canvas全体のImageDataを返す（グリッチエフェクトで全体が使用されるため）
       resolve(imageData);
     };
     img.onerror = () => reject(new Error("Failed to load image"));
