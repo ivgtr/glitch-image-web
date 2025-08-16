@@ -42,6 +42,7 @@ export const Stage = ({ mode, splitHeight }: StageProps) => {
     handleMouseDown(e, y);
   };
 
+
   const handleRandomGlitch = () => {
     applyRandomGlitch();
   };

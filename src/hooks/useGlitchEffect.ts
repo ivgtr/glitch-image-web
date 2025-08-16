@@ -43,12 +43,11 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
   }, []);
 
   const initializeCanvas = useCallback(async (imageSrc: string) => {
-    const { canvas } = getCanvas();
+    const { canvas, ctx } = getCanvas();
 
     try {
       const imageData = await loadImageToCanvas(canvas, imageSrc);
       originImageDataRef.current = imageData;
-      
       
       // 初期状態として元画像データを前回状態にも設定
       prevImageDataRef.current = new ImageData(
@@ -56,6 +55,9 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
         imageData.width,
         imageData.height
       );
+      
+      // Canvasに再描画
+      ctx.putImageData(imageData, 0, 0);
     } catch (error) {
       console.error('Failed to initialize canvas:', error);
     }

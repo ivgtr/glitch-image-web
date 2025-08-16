@@ -44,6 +44,23 @@ export const loadImageToCanvas = (
       ctx.drawImage(img, x, y, iw, 300);
       
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
+      // シンプルな解決策：純黒(0,0,0,255)を(1,1,1,255)に置換
+      // 視覚的にはほぼ変わらず、アルファ値の問題を回避
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        if (imageData.data[i] === 0 && 
+            imageData.data[i + 1] === 0 && 
+            imageData.data[i + 2] === 0 && 
+            imageData.data[i + 3] === 255) {
+          imageData.data[i] = 1;
+          imageData.data[i + 1] = 1;
+          imageData.data[i + 2] = 1;
+        }
+      }
+      
+      // 修正したimageDataをCanvasに再描画
+      ctx.putImageData(imageData, 0, 0);
+      
       resolve(imageData);
     };
     img.onerror = () => reject(new Error("Failed to load image"));
