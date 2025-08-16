@@ -15,14 +15,24 @@ export const GifPreviewModal = ({
   filename = 'glitch-animation.gif'
 }: GifPreviewModalProps) => {
   const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [gifDataUrl, setGifDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (gifBlob && isOpen) {
+      // BlobURLとDataURLの両方を試す
       const url = URL.createObjectURL(gifBlob);
       setGifUrl(url);
       
+      // DataURLにも変換（セキュリティが厳しい環境用）
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGifDataUrl(reader.result as string);
+      };
+      reader.readAsDataURL(gifBlob);
+      
       return () => {
         URL.revokeObjectURL(url);
+        setGifDataUrl(null);
       };
     }
   }, [gifBlob, isOpen]);
@@ -76,12 +86,18 @@ export const GifPreviewModal = ({
       <div className="space-y-4">
         {/* GIFプレビュー */}
         <div className="flex justify-center bg-gray-50 rounded-lg p-4">
-          {gifUrl ? (
+          {(gifDataUrl || gifUrl) ? (
             <img
-              src={gifUrl}
+              src={gifDataUrl || gifUrl || ''}
               alt="生成されたGIFアニメーション"
               className="max-w-full max-h-96 rounded-lg shadow-md"
               style={{ imageRendering: 'pixelated' }}
+              onError={(e) => {
+                // BlobURLが失敗した場合、DataURLにフォールバック
+                if (gifDataUrl && e.currentTarget.src !== gifDataUrl) {
+                  e.currentTarget.src = gifDataUrl;
+                }
+              }}
             />
           ) : (
             <div className="flex items-center justify-center w-64 h-64 bg-gray-200 rounded-lg">
