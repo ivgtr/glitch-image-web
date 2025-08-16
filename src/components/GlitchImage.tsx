@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Stage } from './Stage'
 import { Form } from './Form'
 import { Instructions } from './Instructions'
@@ -12,6 +13,7 @@ function GlitchImage() {
     DEFAULT_MODE,
     DEFAULT_SPLIT_HEIGHT
   );
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
   return (
     <div className="max-w-6xl mx-auto p-8">
@@ -29,7 +31,11 @@ function GlitchImage() {
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Stage - takes up 2 columns on large screens */}
         <section className="lg:col-span-2">
-          <Stage mode={mode} splitHeight={splitHeight} />
+          <Stage 
+            mode={mode} 
+            splitHeight={splitHeight} 
+            onImageSizeChange={setImageSize}
+          />
         </section>
         
         {/* Controls and Instructions - takes up 1 column */}
@@ -38,6 +44,7 @@ function GlitchImage() {
             defaultMode={DEFAULT_MODE}
             defaultSplitHeight={DEFAULT_SPLIT_HEIGHT}
             handleChange={updateSettings}
+            imageHeight={imageSize?.height}
           />
           
           <Instructions />

@@ -1,7 +1,16 @@
 // グリッチエフェクトのモード
 export type GlitchMode = "r" | "g" | "b" | "rgb";
 
-// 分割高さの型
+// 分割高さの設定モード
+export type SplitHeightMode = 'percentage' | 'fixed' | 'full';
+
+// 分割高さの設定
+export interface SplitHeightConfig {
+  mode: SplitHeightMode;
+  value: number; // パーセンテージ(0-100)またはピクセル値
+}
+
+// 後方互換性のため
 export type SplitHeight = number;
 
 // グリッチエフェクトの設定
@@ -54,10 +63,12 @@ export interface EventHandlers {
 export interface StageProps {
   mode: GlitchMode;
   splitHeight: SplitHeight;
+  onImageSizeChange?: (imageSize: { width: number; height: number }) => void;
 }
 
 export interface FormProps {
   defaultMode: GlitchMode;
   defaultSplitHeight: SplitHeight;
   handleChange: (mode: GlitchMode, splitHeight: SplitHeight) => void;
+  imageHeight?: number;
 }

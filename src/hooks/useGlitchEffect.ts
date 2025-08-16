@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { GlitchMode } from '../types';
 import {
   loadImageToCanvas,
@@ -8,6 +8,7 @@ import {
 
 export interface UseGlitchEffectReturn {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  imageSize: { width: number; height: number } | null;
   initializeCanvas: (imageSrc: string) => Promise<void>;
   startDragGlitch: (clickY: number, splitHeight: number) => void;
   glitchImage: (distanceX: number, baseY: number, mode: GlitchMode, splitHeight: number) => void;
@@ -27,6 +28,7 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const originImageDataRef = useRef<ImageData | null>(null);
   const prevImageDataRef = useRef<ImageData | null>(null);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
   // Canvas取得の共通関数（取得失敗時はエラーをスロー）
   const getCanvas = useCallback(() => {
@@ -49,6 +51,12 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
     try {
       const imageData = await loadImageToCanvas(canvas, imageSrc);
       originImageDataRef.current = imageData;
+      
+      // 画像サイズを設定
+      setImageSize({
+        width: imageData.width,
+        height: imageData.height
+      });
       
       // 初期状態として元画像データを前回状態にも設定
       prevImageDataRef.current = new ImageData(
@@ -392,6 +400,7 @@ export const useGlitchEffect = (): UseGlitchEffectReturn => {
 
   return {
     canvasRef,
+    imageSize,
     initializeCanvas,
     startDragGlitch,
     glitchImage,

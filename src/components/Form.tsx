@@ -7,6 +7,7 @@ export const Form = ({
   defaultMode,
   defaultSplitHeight,
   handleChange,
+  imageHeight,
 }: FormProps) => {
   const [mode, setMode] = useState<GlitchMode>(defaultMode);
   const [splitHeight, setSplitHeight] = useState<number>(defaultSplitHeight);
@@ -25,6 +26,7 @@ export const Form = ({
       <SplitHeightSelector
         splitHeight={splitHeight}
         onSplitHeightChange={setSplitHeight}
+        imageHeight={imageHeight}
       />
     </div>
   );
