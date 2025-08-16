@@ -7,7 +7,8 @@ export const Instructions = () => {
       <ul className="space-y-2 text-xs text-gray-600">
         <li>• 画像をアップロード</li>
         <li>• マウス操作でエフェクト適用</li>
-        <li>• モード（R/G/B/RGB）を選択</li>
+        <li>• <kbd className="bg-gray-200 px-1 rounded text-[10px]">Tab</kbd> でモード切り替え（R→G→B→RGB）</li>
+        <li>• <kbd className="bg-gray-200 px-1 rounded text-[10px]">Shift + R</kbd> でリセット</li>
         <li>• 分割高さで粗さを調整</li>
         <li>• Shift + ドラッグで範囲指定</li>
         <li>• 結果をダウンロード</li>

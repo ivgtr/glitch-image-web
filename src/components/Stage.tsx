@@ -8,7 +8,7 @@ import { ImageDropZone } from "./ImageDropZone";
 import { CanvasEditor } from "./CanvasEditor";
 import { GifPreviewModal } from "./GifPreviewModal";
 
-export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChange }: StageProps) => {
+export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChange, resetTrigger }: StageProps) => {
   const { image, isDragging, handleImageSelect, handleDragEnter, handleDragLeave, handleDragOver, handleDrop } = useImageUpload();
   const { canvasRef, imageSize, initializeCanvas, startDragGlitch, glitchImage, finalizeDragGlitch, resetCanvas, applyRandomGlitch, applyRandomGlitchWithIntensity, downloadImage } = useGlitchEffect();
   const { isGenerating, progress, generatedGif, generateRandomGlitchGif } = useGifAnimation();
@@ -32,6 +32,13 @@ export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChang
       setShowGifModal(true);
     }
   }, [generatedGif, isGenerating]);
+
+  // resetTriggerの変更を監視してリセット実行
+  useEffect(() => {
+    if (resetTrigger && resetTrigger > 0) {
+      resetCanvas();
+    }
+  }, [resetTrigger, resetCanvas]);
 
   // 元実装準拠のグローバルイベント管理
   const { baseY, handleMouseDown } = useSimpleGlitch(

@@ -322,7 +322,9 @@ export const CanvasEditor = ({
         <p className="font-medium mb-1">操作方法</p>
         <div className="flex flex-wrap justify-center gap-4 text-xs">
           <span>• <strong>左クリック</strong>: グリッチエフェクト</span>
-          <span>• <strong>Shift + ドラッグ</strong>: 範囲指定（分割高さ設定）</span>
+          <span>• <strong>Shift + ドラッグ</strong>: 範囲指定</span>
+          <span>• <kbd className="bg-gray-200 px-1 rounded text-[10px]">Tab</kbd>: モード切り替え</span>
+          <span>• <kbd className="bg-gray-200 px-1 rounded text-[10px]">Shift + R</kbd>: リセット</span>
         </div>
       </div>
     </div>

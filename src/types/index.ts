@@ -65,6 +65,7 @@ export interface StageProps {
   splitHeight: SplitHeight;
   onImageSizeChange?: (imageSize: { width: number; height: number }) => void;
   onSplitHeightChange?: (value: number) => void;
+  resetTrigger?: number;
 }
 
 export interface FormProps {
