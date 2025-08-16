@@ -71,10 +71,10 @@ function GlitchImage() {
       <header className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-medium text-gray-900">
-            グリッチ画像ツール
+            Glitch Image Web
           </h1>
           <p className="text-xs text-gray-500 mt-1">
-            画像にリアルタイムでグリッチエフェクトを適用
+            簡単操作で画像にグリッチエフェクトを適用
           </p>
         </div>
         

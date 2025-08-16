@@ -1,47 +1,31 @@
-# 🎨 Glitch Image Tool
+![Image](https://github.com/user-attachments/assets/1a8ae577-fc9c-4303-abfe-c9df5b8d79b8)
 
-> リアルタイムで画像にグリッチエフェクトを適用できるWebツール
+ _🖱️ マウス操作で画像にグリッチエフェクトを適用できるWebサイト_
 
-マウス操作で画像を瞬時にアーティスティックなグリッチアートに変換。RGBチャンネル分離やピクセルシフトなど、本格的なグリッチエフェクトを手軽に楽しめます。
+**✨ Demo:** https://ivgtr.github.io/glitch-image-web/
 
-## ✨ 主な機能
-
-- **🖱️ リアルタイムエフェクト** - マウスクリックで即座にグリッチ適用
-- **🎯 RGBチャンネル操作** - R・G・B・RGB・ALLモードで多彩な表現
-- **📏 範囲指定エフェクト** - Shift+ドラッグで精密なエフェクト制御
-- **🎬 GIFアニメーション生成** - ランダムエフェクトでアニメーション作成
-- **💾 簡単ダウンロード** - PNG・GIF形式で即座に保存
+## 基本操作
+- 画像をアップロード
+- マウス操作でエフェクト適用
+- Tab でモード切り替え（R→G→B→RGB→ALL）
+- Shift + R でリセット
+- 分割高さで粗さを調整
+- Shift + ドラッグで範囲指定
+- 結果をダウンロード
 
 ## 🚀 クイックスタート
-
-**[✨ Live Demo](https://ivgtr.github.io/glitch-image-web/)**
 
 ### 💻 ローカル開発
 
 ```bash
-# 1. リポジトリをクローン
 git clone https://github.com/ivgtr/glitch-image-web.git
-
-# 2. 依存関係をインストール
 npm install
-
-# 3. 開発サーバーを起動
 npm run dev
 ```
 
-ブラウザで `http://localhost:5173` を開いて、すぐにグリッチアートを作成できます！
-
-## 🎮 使い方
-
-1. **画像をアップロード** - ドラッグ&ドロップまたはボタンから
-2. **Tabキー** でエフェクトモードを切り替え（R→G→B→RGB→ALL）
-3. **画像をクリック** してグリッチエフェクトを適用
-4. **範囲指定** したい場合はShift+ドラッグ
-5. **結果をダウンロード** してシェア
-
 ## 🌟 推奨環境
 
-- **画面幅**: 810px以上（デスクトップPC）
+- **画面幅**: 810px以上（PC）
 - **ブラウザ**: Chrome, Firefox, Safari, Edge（最新版）
 - **操作**: マウス・トラックパッド推奨
 
@@ -49,8 +33,4 @@ npm run dev
 
 MIT License
 
----
-
-<p align="center">
-Made with ❤️ for creative expression
-</p>
+©2025 ivgtr
