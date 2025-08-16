@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useImageUpload } from "../hooks/useImageUpload";
 import { useGlitchEffect } from "../hooks/useGlitchEffect";
 import { useSimpleGlitch } from "../hooks/useSimpleGlitch";
@@ -6,11 +6,13 @@ import { useGifAnimation } from "../hooks/useGifAnimation";
 import { StageProps } from "../types";
 import { ImageDropZone } from "./ImageDropZone";
 import { CanvasEditor } from "./CanvasEditor";
+import { GifPreviewModal } from "./GifPreviewModal";
 
 export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChange }: StageProps) => {
   const { image, isDragging, handleImageSelect, handleDragEnter, handleDragLeave, handleDragOver, handleDrop } = useImageUpload();
   const { canvasRef, imageSize, initializeCanvas, startDragGlitch, glitchImage, finalizeDragGlitch, resetCanvas, applyRandomGlitch, applyRandomGlitchWithIntensity, downloadImage } = useGlitchEffect();
-  const { isGenerating, progress, generateRandomGlitchGif } = useGifAnimation();
+  const { isGenerating, progress, generatedGif, generateRandomGlitchGif } = useGifAnimation();
+  const [showGifModal, setShowGifModal] = useState(false);
 
   useEffect(() => {
     if (image) {
@@ -23,6 +25,13 @@ export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChang
       onImageSizeChange(imageSize);
     }
   }, [imageSize, onImageSizeChange]);
+
+  // GIF生成完了時にモーダルを表示
+  useEffect(() => {
+    if (generatedGif && !isGenerating) {
+      setShowGifModal(true);
+    }
+  }, [generatedGif, isGenerating]);
 
   // 元実装準拠のグローバルイベント管理
   const { baseY, handleMouseDown } = useSimpleGlitch(
@@ -59,8 +68,15 @@ export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChang
     generateRandomGlitchGif(canvasRef, applyRandomGlitch, applyRandomGlitchWithIntensity, resetCanvas);
   };
 
+  const handleCloseGifModal = () => {
+    setShowGifModal(false);
+  };
+
+  const gifFilename = `dynamic-glitch-${new Date().toISOString().replace(/[:.]/g, '-')}.gif`;
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <>
+      <div className="bg-white rounded-xl shadow-lg p-6">
       {!image ? (
         <ImageDropZone
           isDragging={isDragging}
@@ -86,6 +102,15 @@ export const Stage = ({ mode, splitHeight, onImageSizeChange, onSplitHeightChang
           onSplitHeightChange={onSplitHeightChange}
         />
       )}
-    </div>
+      </div>
+
+      {/* GIFプレビューモーダル */}
+      <GifPreviewModal
+        isOpen={showGifModal}
+        onClose={handleCloseGifModal}
+        gifBlob={generatedGif}
+        filename={gifFilename}
+      />
+    </>
   );
 };

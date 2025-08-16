@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { GifGenerator, cloneCanvas, downloadGif } from '../utils/gifGenerator';
+import { GifGenerator, cloneCanvas } from '../utils/gifGenerator';
 import { 
   generateAnimationSequence, 
   getDelayTime, 
@@ -10,6 +10,7 @@ import {
 export interface UseGifAnimationReturn {
   isGenerating: boolean;
   progress: number;
+  generatedGif: Blob | null;
   generateRandomGlitchGif: (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     applyRandomGlitch: () => void,
@@ -25,6 +26,7 @@ export interface UseGifAnimationReturn {
 export const useGifAnimation = (): UseGifAnimationReturn => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [generatedGif, setGeneratedGif] = useState<Blob | null>(null);
 
   const generateRandomGlitchGif = useCallback(async (
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
@@ -85,9 +87,8 @@ export const useGifAnimation = (): UseGifAnimationReturn => {
       // GIFを生成
       const blob = await gifGenerator.generateGif();
       
-      // GIFをダウンロード
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      downloadGif(blob, `dynamic-glitch-${timestamp}.gif`);
+      // 生成されたGIFを状態に保存
+      setGeneratedGif(blob);
 
       setProgress(100);
       
@@ -151,6 +152,7 @@ export const useGifAnimation = (): UseGifAnimationReturn => {
   return {
     isGenerating,
     progress,
+    generatedGif,
     generateRandomGlitchGif,
   };
 };
