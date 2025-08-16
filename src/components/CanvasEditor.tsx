@@ -251,7 +251,7 @@ export const CanvasEditor = ({
   return (
     <div className="space-y-6">
       <div 
-        className="relative w-full h-[300px] transparency-checkerboard"
+        className="relative w-full h-[300px]"
       >
         <div className="flex items-center justify-center w-full h-full">
           <div 
@@ -260,7 +260,7 @@ export const CanvasEditor = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleRangeMouseUp}
-            className="relative cursor-crosshair"
+            className="relative cursor-crosshair transparency-checkerboard"
             title="左クリック: グリッチ効果 | Shift + ドラッグ: 範囲指定"
           >
             <canvas ref={canvasRef} />
