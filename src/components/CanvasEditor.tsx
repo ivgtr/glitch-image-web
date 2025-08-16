@@ -250,7 +250,9 @@ export const CanvasEditor = ({
 
   return (
     <div className="space-y-6">
-      <div className="relative w-full h-[300px] bg-slate-200 dark:bg-slate-800">
+      <div 
+        className="relative w-full h-[300px] transparency-checkerboard"
+      >
         <div className="flex items-center justify-center w-full h-full">
           <div 
             onMouseDown={handleRangeMouseDown}
