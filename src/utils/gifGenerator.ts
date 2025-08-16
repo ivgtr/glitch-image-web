@@ -29,13 +29,15 @@ export class GifGenerator {
 
   constructor(options: GifGeneratorOptions) {
     this.options = options;
+    // GitHub PagesとローカルのbasePathを考慮
+    const basePath = import.meta.env.BASE_URL || '/';
     this.gif = new GIF({
       workers: 2,
       quality: options.quality,
       width: options.width,
       height: options.height,
       transparent: options.transparent || "#000000", // デフォルトで黒を透明にする
-      workerScript: '/gif.worker.js', // publicディレクトリに配置
+      workerScript: `${basePath}gif.worker.js`, // basePathを含むパスに修正
     });
   }
 
@@ -85,13 +87,15 @@ export class GifGenerator {
    */
   reset(): void {
     this.gif.abort();
+    // GitHub PagesとローカルのbasePathを考慮
+    const basePath = import.meta.env.BASE_URL || '/';
     this.gif = new GIF({
       workers: 2,
       quality: this.options.quality,
       width: this.options.width,
       height: this.options.height,
       transparent: this.options.transparent || "#000000",
-      workerScript: '/gif.worker.js',
+      workerScript: `${basePath}gif.worker.js`,
     });
   }
 }
