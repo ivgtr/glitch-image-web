@@ -17,7 +17,7 @@ export const Form = ({
   }, [mode, splitHeight, handleChange]);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
       <ModeSelector
         selectedMode={mode}
         onModeChange={setMode}

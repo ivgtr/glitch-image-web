@@ -20,21 +20,23 @@ function GlitchImage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
       {/* Header */}
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-          グリッチ画像ツール
-        </h1>
-        <p className="text-xl text-gray-700 mb-8">
-          画像にリアルタイムでグリッチエフェクトを適用
-        </p>
+      <header className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-medium text-gray-900">
+            グリッチ画像ツール
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            画像にリアルタイムでグリッチエフェクトを適用
+          </p>
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Stage - takes up 2 columns on large screens */}
-        <section className="lg:col-span-2">
+      <main className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Stage - takes up 3 columns on large screens */}
+        <section className="lg:col-span-3">
           <Stage 
             mode={mode} 
             splitHeight={splitHeight} 
@@ -44,7 +46,7 @@ function GlitchImage() {
         </section>
         
         {/* Controls and Instructions - takes up 1 column */}
-        <aside className="space-y-6">
+        <aside className="space-y-4">
           <Form
             defaultMode={DEFAULT_MODE}
             defaultSplitHeight={DEFAULT_SPLIT_HEIGHT}
